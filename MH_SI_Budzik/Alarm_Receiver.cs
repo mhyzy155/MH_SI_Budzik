@@ -13,7 +13,7 @@ using Android.Util;
 
 namespace MH_SI_Budzik
 {
-    [BroadcastReceiver]
+    [BroadcastReceiver(Enabled = true)]
     public class Alarm_Receiver : BroadcastReceiver
     {
         public override void OnReceive(Context context, Intent intent)

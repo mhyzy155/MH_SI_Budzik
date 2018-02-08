@@ -56,6 +56,7 @@ namespace MH_SI_Budzik
 
                 calendar.Set(Calendar.HourOfDay, hour);
                 calendar.Set(Calendar.Minute, minute);
+                calendar.Set(Calendar.Second, 0);
 
                 DateTime dateTime = DateTime.Now;
 
@@ -125,7 +126,7 @@ namespace MH_SI_Budzik
                 pending_intent = PendingIntent.GetBroadcast(this, 0, my_intent, PendingIntentFlags.UpdateCurrent);
 
                 // set the alarm manager
-                alarm_manager.Set(AlarmType.RtcWakeup, calendar.TimeInMillis, pending_intent);
+                alarm_manager.SetExact(AlarmType.RtcWakeup, calendar.TimeInMillis, pending_intent);
             };
 
             // initialize stop button
