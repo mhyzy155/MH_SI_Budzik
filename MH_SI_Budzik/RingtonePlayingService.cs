@@ -17,23 +17,30 @@ namespace MH_SI_Budzik
     [Service]
     class RingtonePlayingService : Service
     {
+        //klasa odtwarzająca dźwięk
         MediaPlayer media_song;
-        Boolean isRunning;
-        public static Android.Net.Uri ringtone_uri = Android.Net.Uri.Parse("android.resource://MH_SI_Budzik.MH_SI_Budzik/" + Resource.Raw.hitsound);
-        //int start_id;
 
+        //zmienna wskazująca czy ten Service jest używany
+        Boolean isRunning;
+
+        //ustawienie domyślnego dźwięku alarmu(a raczej ścieżki do pliku dzwiękowego)
+        public static Android.Net.Uri ringtone_uri = Android.Net.Uri.Parse("android.resource://MH_SI_Budzik.MH_SI_Budzik/" + Resource.Raw.hitsound);
+
+        //nie robi nic ale trzeba nadpisać tę funkcję bo nie bedzie działać
         public override IBinder OnBind(Intent intent)
         {
             throw new NotImplementedException();
         }
 
+        //obsługa przychodzących intentów
         public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
         {
-            Log.Info("LocalService", "Received start id" + startId + ": " + intent);
+            Log.Info("Przychodzacy service", "id: " + startId + ", intent: " + intent); //sprawdzenie poprawności wykonywania programu
 
+            //pobranie extra boolean z intent
             Boolean state = intent.GetBooleanExtra("extra", true);
-            Log.Error("Ringtone state: ", state.ToString());
-            //Log.Error("startId WAS set to: ", startId.ToString());
+
+            //z extra boolean wynika, że alarm powinien być włączony, a service nie jest uruchomiony - włącz dzwięk alarmu i odpal nowe Activity(z rozwiązywaniem rówania)
             if (state && !this.isRunning)
             {
                 // create an instance of the media player
@@ -41,20 +48,14 @@ namespace MH_SI_Budzik
                 media_song.Looping = true;
                 media_song.Start();
 
-                // set up the notification service
-                NotificationManager notify_manager = (NotificationManager)GetSystemService(NotificationService);
-                // set up the intent that goes to the MainActivity
-                Intent notification_intent = new Intent(this.ApplicationContext, typeof(MainActivity));
-                PendingIntent notification_pending_intent = PendingIntent.GetActivity(this, 0, notification_intent, 0);
-                //make the notification parameters
-                Notification notification_popup = new Notification.Builder(this).SetContentTitle("Tytul").SetContentText("Tekst").SetSmallIcon(Resource.Drawable.ic_notification).SetContentIntent(notification_pending_intent).SetAutoCancel(true).Build();
-
-                // set up notification start command
-                notify_manager.Notify(0, notification_popup);
-
                 this.isRunning = true;
                 state = false;
+
+                Intent zagadka_intent = new Intent(this, typeof(Zagadka));
+                StartActivity(zagadka_intent);
+
             }
+            //boolean - alarm powienien być wyłączony a service dalej jest uruchomiony - wyłącz dźwięk
             else if (!state && this.isRunning)
             {
                 media_song.Stop();
@@ -62,16 +63,12 @@ namespace MH_SI_Budzik
 
                 this.isRunning = false;
             };
-            //Log.Error("startId IS set to: ", startId.ToString());
-
-
-
             return StartCommandResult.NotSticky;
         }
 
+        //destruktor
         public override void OnDestroy()
         {
-            Toast.MakeText(this, "on Destroy called", ToastLength.Short).Show();
             base.OnDestroy();
         }
     }

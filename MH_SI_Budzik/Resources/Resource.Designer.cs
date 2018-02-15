@@ -45,7 +45,10 @@ namespace MH_SI_Budzik
 		{
 			
 			// aapt resource value: 0x7f020000
-			public const int ic_notification = 2130837504;
+			public const int ic_alarm_black_48dp = 2130837504;
+			
+			// aapt resource value: 0x7f020001
+			public const int ic_settings_black_48dp = 2130837505;
 			
 			static Drawable()
 			{
@@ -69,8 +72,8 @@ namespace MH_SI_Budzik
 			// aapt resource value: 0x7f070004
 			public const int linear1 = 2131165188;
 			
-			// aapt resource value: 0x7f070008
-			public const int settings = 2131165192;
+			// aapt resource value: 0x7f07000c
+			public const int settings = 2131165196;
 			
 			// aapt resource value: 0x7f070001
 			public const int textView1 = 2131165185;
@@ -86,6 +89,18 @@ namespace MH_SI_Budzik
 			
 			// aapt resource value: 0x7f070000
 			public const int timePicker1 = 2131165184;
+			
+			// aapt resource value: 0x7f07000b
+			public const int zagadka_button = 2131165195;
+			
+			// aapt resource value: 0x7f07000a
+			public const int zagadka_editText = 2131165194;
+			
+			// aapt resource value: 0x7f070008
+			public const int zagadka_text1 = 2131165192;
+			
+			// aapt resource value: 0x7f070009
+			public const int zagadka_text2 = 2131165193;
 			
 			static Id()
 			{
@@ -105,6 +120,9 @@ namespace MH_SI_Budzik
 			
 			// aapt resource value: 0x7f030001
 			public const int Settings = 2130903041;
+			
+			// aapt resource value: 0x7f030002
+			public const int Zagadka = 2130903042;
 			
 			static Layout()
 			{

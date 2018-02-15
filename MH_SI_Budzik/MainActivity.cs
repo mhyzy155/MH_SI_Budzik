@@ -15,70 +15,85 @@ namespace MH_SI_Budzik
     [Activity(Label = "MH_SI_Budzik", MainLauncher = true)]
     public class MainActivity : Activity
     {
-        AlarmManager alarm_manager;
+        static AlarmManager alarm_manager;
         TimePicker alarm_timepicker;
         TextView textView3;
-        PendingIntent pending_intent;
+        static Intent my_intent;
+        static PendingIntent pending_intent;
+
+        //czas zasypiania zmieniany w ustawieniach(domyślnie 0)
         public static int czasZasypiania = 0;
 
+        //funkcja wywoływana przy odpaleniu apki
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-
-            // Set our view from the "main" layout resource
+            //wczytanie wyglądu z main.axml
             SetContentView(Resource.Layout.Main);
-            //this.context = this;
 
-            // initialize our alarm manager
+            //zainicjalizowanie alarm_managera
             alarm_manager = (AlarmManager)GetSystemService(AlarmService);
 
-            // initialize out timepicker
-            alarm_timepicker = (TimePicker)FindViewById(Resource.Id.timePicker1);
+            //zainicjowanie timepickera
+            alarm_timepicker = FindViewById<TimePicker>(Resource.Id.timePicker1);
 
-            // initialize our text update box
-            textView3 = (TextView)FindViewById(Resource.Id.textView3);
+            //zainicjowanie tekstu textView3 (godziny zaśnięcia)
+            textView3 = FindViewById<TextView>(Resource.Id.textView3);
 
-            // create an instance of a calendar
+            //stworzenie kalendarza
             Calendar calendar = Calendar.Instance;
 
-            //create an intent to the Alarm Receiver class
-            Intent my_intent = new Intent(this, typeof(Alarm_Receiver));
+            //stworzenie Intent kierującego do klasy Alarm_Receiver
+            my_intent = new Intent(this, typeof(Alarm_Receiver));
 
-            // initialize start button
-            Button textView1 = (Button)FindViewById(Resource.Id.textView1);
+            //zainicjowanie przycisku "Ustaw" alarm
+            Button textView1 = FindViewById<Button>(Resource.Id.textView1);
 
-            // create an onClick listener to start the alarm
+            //reakcja na kliknięcie przycisku "Ustaw" alarm
             textView1.Click += (sender, e) =>
             {
+                //pobranie czasu z TimePickera
                 int hour = alarm_timepicker.Hour;
                 int minute = alarm_timepicker.Minute;
 
+                //ustawienie czasu alarmu w kalendarzu(potrzebne do ustawienia alarmu w alarm_managerze)
                 calendar.Set(Calendar.HourOfDay, hour);
                 calendar.Set(Calendar.Minute, minute);
                 calendar.Set(Calendar.Second, 0);
 
+                //pobranie aktualnego czasu
                 DateTime dateTime = DateTime.Now;
 
+                //tworzymy zmienną tej samej klasy co aktualny czas i podajemy do niej czas alarmu
                 DateTime date = new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, hour, minute, dateTime.Second);
+
+                //liczenie różnicy, sprawdzenie czy nie jest ujemna, jeśli jest to dodaj 24h (alarm dnia następnego)
                 double d_roznica = (date - dateTime).TotalMinutes;
                 int roznica;
-                if (d_roznica < 0)
+                if (d_roznica < 0) //podajemy double bo różnica może być -0.1 jak i 0.1, a int zaokrąglił by oba przypadki do 0 (ujemny double, a int już dodatni)
                 {
                     roznica = (int)(date - dateTime).TotalMinutes + 1440;
                     calendar.Set(Calendar.DayOfYear, dateTime.DayOfYear + 1);
                 }
                 else roznica = (int)(date - dateTime).TotalMinutes;
-                //Toast.MakeText(this, (date - dateTime).TotalMinutes.ToString(), ToastLength.Short).Show();
+
+                //wyliczenie ile zostaje pełnych cykli snu(1,5h) z uwzględnieniem czasu zasypiania
                 int hour_counter = (roznica - czasZasypiania) / 90;
+
+                //jeśli zostanie za dużo czasu na sen, to ograniczamy sen do max. 9 godzin snu
                 if (hour_counter > 6) hour_counter = 6;
+
+                //stworzenie i wypełnienie listy z godzinami, kiedy masz się położyć (tworzenie max. 3 propozycji)
                 List<DateTime> godziny_snu = new List<DateTime>();
                 for (int i = hour_counter; i > 0 && i > (hour_counter - 3); i--)
                 {
+                    //kożystając z klasy TimeSpan odejmujemy od godziny alarmu czas snu z uwzględnieniem czasu zasypiania - pozwala to wyznaczyć godzinę o której trzeba położyć się spać
                     godziny_snu.Add(date.Add(new TimeSpan(0, -(i * 90) - czasZasypiania, 0)));
                 }
 
-                //Toast.MakeText(this, hour_counter.ToString(), ToastLength.Short).Show();
+                //wyświetlanie godzin o której masz iść spać, podział ze względu na podanie czasu potrzebnego na zaśnięcie
+                //wyświetlanie różnych komunikatów w zależności od ilości czasu pozostałego na spanie
                 if (czasZasypiania != 0)
                 {
                     switch (godziny_snu.Count)
@@ -119,58 +134,68 @@ namespace MH_SI_Budzik
                             break;
                     }
                 }
-                // put in extra string into my_intent, tells the clock that you pressed the "alarm on" button
+                //dodanie extra boolean do my_intent, true - włącz dźwięk alarmu gdy sygnał przyjdzie do Alarm_Receiver i następnie do RingtonePlayingService
                 my_intent.PutExtra("extra", true);
 
-                // create a pending intent that delays the intent until the specified calendar time
+                //stworzenie PendingIntent, czyli opóźnionego Intent
                 pending_intent = PendingIntent.GetBroadcast(this, 0, my_intent, PendingIntentFlags.UpdateCurrent);
 
-                // set the alarm manager
+                //ustawienie alarmu dla pending_intent na czas zapisany w calendar
                 alarm_manager.SetExact(AlarmType.RtcWakeup, calendar.TimeInMillis, pending_intent);
             };
 
-            // initialize stop button
-            Button textView2 = (Button)FindViewById(Resource.Id.textView2);
+            //zainicjowanie przycisku "Anuluj"
+            Button textView2 = FindViewById<Button>(Resource.Id.textView2);
 
-            // create an onClick listener to stop the alarm
+            //reakcja na kliknięcie "Anuluj" alarm
             textView2.Click += (sender, e) =>
             {
                 Set_alarm_text("Alarm anulowany!");
-
-                // cancel the alarm
-                alarm_manager.Cancel(pending_intent);
-
-                // put extra string into my_intent, tells the clock that you pressed "alarm off" button
-                my_intent.PutExtra("extra", false);
-
-                // stop the ringtone
-                SendBroadcast(my_intent);
+                AnulujAlarm(this);
 
             };
 
         }
 
+        //funkcja anulowania alarmu
+        public static void AnulujAlarm(Context context)
+        {
+            //anuluj alarm w alarm_menagerze
+            alarm_manager.Cancel(pending_intent);
+
+            //dodaj extra boolean do my_intent, false - wylacz dzwiek alarmu
+            my_intent.PutExtra("extra", false);
+
+            //wyłacz alarm
+            context.SendBroadcast(my_intent);
+        }
+
+        //funkcja dodająca pasek z możliwością przejścia do ustawień
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.top_menus, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
+        //funkcja wywoływana po naciśnięciu ikony ustawień
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.settings)
             {
+                //stworzenie intent i przejście do Activity z ustawieniami
                 Intent settings_intent = new Intent(this, typeof(Settings));
                 StartActivity(settings_intent);
             }
             return true;
         }
 
+        //ustawienie tekstu textView3 na określony napis
         private void Set_alarm_text(string output)
         {
             textView3.Text = output;
         }
 
+        //formatowanie wyświetlanej godziny
         private System.String FormMinut(int czasMinuty)
         {
             System.String minutes;

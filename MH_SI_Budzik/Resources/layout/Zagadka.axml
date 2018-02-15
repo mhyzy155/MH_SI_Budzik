@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minWidth="25px"
+    android:minHeight="25px"
+    android:layout_centerVertical="true">
+    <TextView
+        android:text="Aby wyłączyć budzik, rozwiąż równanie:"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/zagadka_text1" />
+    <TextView
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/zagadka_text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/zagadka_text2" />
+    <EditText
+        android:inputType="numberDecimal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/zagadka_text2"
+        android:id="@+id/zagadka_editText" />
+    <Button
+        android:text="Wyłącz budzik"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/zagadka_editText"
+        android:id="@+id/zagadka_button"
+        android:clickable="true" />
+</RelativeLayout>

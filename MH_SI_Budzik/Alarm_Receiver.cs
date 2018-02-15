@@ -18,20 +18,18 @@ namespace MH_SI_Budzik
     {
         public override void OnReceive(Context context, Intent intent)
         {
-            Log.Error("We are in the receiver.", "Ok.");
-
-            // fetch extra strings from the intent
+            //pobranie extra boolean z intent
             Boolean get_your_bool = intent.GetBooleanExtra("extra", true);
-            Log.Error("What is the key? ", get_your_bool.ToString());
+            Log.Error("Wartosc boola: ", get_your_bool.ToString()); //sprawdzenie poprawności wykonywania programu
 
 
-            // create an intent to the ringtone service
+            //stworzenie Intentu prowadzącego do klasy RingtonePlayingService
             Intent service_intent = new Intent(context, typeof(RingtonePlayingService));
 
-            // pass the extra string to the RingtonePlayingService
+            //przekazanie extra boolean dalej do RingtonePlayingService
             service_intent.PutExtra("extra", get_your_bool);
 
-            // start the ringtone service
+            //uruchomienie RingtonePlayingService za pomocą service_intent
             context.StartService(service_intent);
         }
     }

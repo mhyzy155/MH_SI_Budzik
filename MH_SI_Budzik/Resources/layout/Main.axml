@@ -23,7 +23,7 @@
         android:id="@+id/textView1"
         android:clickable="true" />
     <Button
-        android:text="Wyłącz"
+        android:text="Anuluj"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
