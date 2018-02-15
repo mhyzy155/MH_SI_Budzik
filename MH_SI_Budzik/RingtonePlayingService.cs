@@ -52,6 +52,7 @@ namespace MH_SI_Budzik
                 state = false;
 
                 Intent zagadka_intent = new Intent(this, typeof(Zagadka));
+                zagadka_intent.SetFlags(ActivityFlags.NewTask);
                 StartActivity(zagadka_intent);
 
             }
